@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Website</title>
+    <!-- Axios for HTTP requests -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #ffe6f2;
+        }
+        header {
+            background-color: #ff4d94;
+            padding: 15px;
+            text-align: center;
+        }
+        nav {
+            margin: 10px 0;
+        }
+        nav a, nav button {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        nav button {
+            background-color: #e60073;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        section {
+            padding: 20px;
+            margin: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+        }
+        #home {
+            background-size: cover;
+            background-position: center;
+            color: white;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 8px;
+            position: relative;
+        }
+        #home h2 {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 100%;
+        }
+        input, textarea, button {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ff4d94;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+        }
+        button.submit-btn {
+            background-color: #ff4d94;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button.submit-btn:hover {
+            background-color: #e60073;
+        }
+        #upload-image {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>My Personal Website</h1>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#personal-info">Personal Info</a>
+        <a href="#education">Education</a>
+        <a href="#work-experience">Work Experience</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <button id="download-pdf">Download PDF</button>
+    </nav>
+</header>
+
+<section id="home" style="background-image: url('./your-image-url.jpeg');">
+    <h2>Welcome to My Website</h2>
+</section>
+
+<section id="upload-section">
+    <h2>Upload Your Picture</h2>
+    <input type="file" id="upload-image" accept="image/*">
+    <button id="upload-btn" class="submit-btn">Upload Image</button>
+</section>
+
+<section id="personal-info">
+    <h2>Personal Information</h2>
+    <form id="personal-form">
+        <label>Name:</label>
+        <input type="text" id="name" placeholder="John Doe" required>
+        <label>Contact:</label>
+        <input type="email" id="contact" placeholder="john.doe@example.com" required>
+        <label>Short Bio:</label>
+        <textarea id="bio" placeholder="A brief introduction about yourself." required></textarea>
+        <button type="submit" class="submit-btn">Save Personal Info</button>
+    </form>
+</section>
+
+<section id="education">
+    <h2>Education</h2>
+    <form id="education-form">
+        <label>Education Details:</label>
+        <textarea id="education-details" placeholder="Details of your educational background." required></textarea>
+        <button type="submit" class="submit-btn">Save Education</button>
+    </form>
+</section>
+
+<section id="work-experience">
+    <h2>Work Experience</h2>
+    <form id="work-experience-form">
+        <label>Work Experience Details:</label>
+        <textarea id="work-experience-details" placeholder="Information on your professional experience." required></textarea>
+        <button type="submit" class="submit-btn">Save Work Experience</button>
+    </form>
+</section>
+
+<section id="skills">
+    <h2>Skills</h2>
+    <form id="skills-form">
+        <label>Skills List:</label>
+        <textarea id="skills-list" placeholder="List your skills, separated by commas." required></textarea>
+        <button type="submit" class="submit-btn">Save Skills</button>
+    </form>
+</section>
+
+<section id="projects">
+    <h2>Projects</h2>
+    <form id="projects-form">
+        <label>Projects Details:</label>
+        <textarea id="projects-details" placeholder="Descriptions of significant projects you have worked on." required></textarea>
+        <button type="submit" class="submit-btn">Save Projects</button>
+    </form>
+</section>
+
+<section id="contact">
+    <h2>Contact Form</h2>
+    <form id="contact-form">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" placeholder="Your Message" required></textarea>
+        <button type="submit" class="submit-btn">Send Message</button>
+    </form>
+</section>
+
+<script>
+    const API_BASE = 'http://localhost:3001/ronell'; 
+
+    // Function to fetch all data and populate fields
+    const fetchAllData = async () => {
+        try {
+            // Fetch Personal Info
+            const personalRes = await axios.get(`${API_BASE}/Personal`);
+            if (personalRes.status === 200) {
+                const data = personalRes.data;
+                document.getElementById('name').value = data.name || '';
+                document.getElementById('contact').value = data.contact || '';
+                document.getElementById('bio').value = data.bio || '';
+            }
+
+            // Fetch Education
+            const educationRes = await axios.get(`${API_BASE}/Education`);
+            if (educationRes.status === 200) {
+                document.getElementById('education-details').value = educationRes.data.educationDetails || '';
+            }
+
+            // Fetch Work Experience
+            const workExpRes = await axios.get(`${API_BASE}/WorkExperience`);
+            if (workExpRes.status === 200) {
+                document.getElementById('work-experience-details').value = workExpRes.data.workExperienceDetails || '';
+            }
+
+            // Fetch Skills
+            const skillsRes = await axios.get(`${API_BASE}/Skills`);
+            if (skillsRes.status === 200) {
+                document.getElementById('skills-list').value = skillsRes.data.skillsList || '';
+            }
+
+            // Fetch Projects
+            const projectsRes = await axios.get(`${API_BASE}/Projects`);
+            if (projectsRes.status === 200) {
+                document.getElementById('projects-details').value = projectsRes.data.projectsDetails || '';
+            }
+
+            // Fetch Image
+            const imageRes = await axios.get(`${API_BASE}/Image`);
+            if (imageRes.status === 200) {
+                const imageData = imageRes.data.imageData;
+                if (imageData) {
+                    document.getElementById('home').style.backgroundImage = `url(${imageData})`;
+                }
+            }
+
+        } catch (err) {
+            console.error('Error fetching data:', err);
+        }
+    };
+
+    // Call fetchAllData on initial load
+    window.onload = fetchAllData;
+
+    // Handle Personal Info Form Submission
+    document.getElementById('personal-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const contact = document.getElementById('contact').value.trim();
+        const bio = document.getElementById('bio').value.trim();
+
+        try {
+            const response = await axios.post(`${API_BASE}/Personal`, { name, contact, bio });
+            console.log('Personal info saved successfully', response);
+            alert('Personal info saved successfully');
+        } catch (err) {
+            console.error('Error saving personal info', err);
+        }
+    });
+
+    // Handle Education Form Submission
+    document.getElementById('education-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const educationDetails = document.getElementById('education-details').value.trim();
+
+        try {
+            const response = await axios.post(`${API_BASE}/Education`, { educationDetails });
+            console.log('Education saved successfully', response);
+            alert('Education saved successfully');
+        } catch (err) {
+            console.error('Error saving education', err);
+        }
+    });
+
+    // Handle Work Experience Form Submission
+    document.getElementById('work-experience-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const workExperienceDetails = document.getElementById('work-experience-details').value.trim();
+
+        try {
+            const response = await axios.post(`${API_BASE}/WorkExperience`, { workExperienceDetails });
+            console.log('Work experience saved successfully', response);
+            alert('Work experience saved successfully');
+        } catch (err) {
+            console.error('Error saving work experience', err);
+        }
+    });
+
+    // Handle Skills Form Submission
+    document.getElementById('skills-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const skillsList = document.getElementById('skills-list').value.trim();
+
+        try {
+            const response = await axios.post(`${API_BASE}/Skills`, { skillsList });
+            console.log('Skills saved successfully', response);
+            alert('Work experience saved successfully');
+        } catch (err) {
+            console.error('Error saving skills', err);
+        }
+    });
+
+    // Handle Projects Form Submission
+    document.getElementById('projects-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const projectsDetails = document.getElementById('projects-details').value.trim();
+
+        try {
+            const response = await axios.post(`${API_BASE}/Projects`, { projectsDetails });
+            console.log('Projects saved successfully', response);
+            alert('Projects saved successfully');
+        } catch (err) {
+            console.error('Error saving projects', err);
+        }
+    });
+
+    // Handle Image Upload
+    document.getElementById('upload-btn').addEventListener('click', async function() {
+        const imageInput = document.getElementById('upload-image');
+        const file = imageInput.files[0];
+
+        if (!file) {
+            alert('Please select an image to upload.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await axios.post(`${API_BASE}/Image`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            console.log('Image uploaded successfully', response);
+            alert('Image uploaded successfully');
+        } catch (err) {
+            console.error('Error uploading image', err);
+            alert('Error uploading image');
+        }
+    });
+
+    // PDF Generation
+    document.getElementById('download-pdf').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.text('Personal Information', 10, 10);
+        doc.text(`Name: ${document.getElementById('name').value}`, 10, 20);
+        doc.text(`Contact: ${document.getElementById('contact').value}`, 10, 30);
+        doc.text(`Bio: ${document.getElementById('bio').value}`, 10, 40);
+        
+        doc.text('Education', 10, 50);
+        doc.text(document.getElementById('education-details').value, 10, 60);
+        
+        doc.text('Work Experience', 10, 70);
+        doc.text(document.getElementById('work-experience-details').value, 10, 80);
+
+        doc.text('Skills', 10, 90);
+        doc.text(document.getElementById('skills-list').value, 10, 100);
+        
+        doc.text('Projects', 10, 110);
+        doc.text(document.getElementById('projects-details').value, 10, 120);
+
+        doc.save('resume.pdf');
+    });
+
+</script>
+
+</body>
+</html>
